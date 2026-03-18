@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSVP - The Wedding</title>
+    <link href="https://fonts.googleapis.com/css2?family=Gotu&display=swap" rel="stylesheet">
+    <style>
+        body::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2; background-image: url('cloth-bg.jpg');
+            background-size: cover; background-position: center;
+        }
+    
+        #animatedDoily {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(1);
+            z-index: 10;
+            height: 30vh; 
+            width: auto;
+            cursor: pointer;
+            transition: none;
+            will-change: transform;
+        }
+    
+        #animatedDoily.final {
+            transform: translate(-50%, -50%) scale(3.16);
+            z-index: -1; 
+            cursor: default;
+        }
+    
+        body {
+            background-color: white; color: black; font-family: 'Gotu', sans-serif;
+            letter-spacing: 0.08em; display: flex; justify-content: center;
+            align-items: center; min-height: 100vh; margin: 0;
+            text-align: center; text-transform: uppercase;
+            overflow-x: hidden;
+        }
+    
+        .container { 
+            /* Widened container to allow the text to breathe inside the doily */
+            width: 100vh; 
+            max-width: 90vw;
+            padding: 20px; 
+            opacity: 0; 
+            z-index: 5;
+            transition: opacity 0.2s ease-in; 
+            pointer-events: none; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box;
+        }
+    
+        .container.visible { opacity: 1; pointer-events: auto; }
+    
+        .top-section {
+            margin-top: 2vh; 
+            width: 100%;
+        }
+    
+        /* Clean, Large Typography */
+        h1 { font-size: 1.8rem; margin: 0; font-weight: normal; letter-spacing: 0.2em; }
+        h2 { font-size: 4.2rem; margin: 10px 0 35px 0; font-weight: normal; }
+        
+        .logistics { 
+            font-size: 3rem; 
+            margin-top: 2em;
+            margin-bottom: 2.5em; 
+            line-height: 1.8;
+            color: grey;
+        }
+    
+        .label-small { 
+            font-size: 0.75rem; 
+            display: block; 
+            margin-bottom: 4px; 
+            opacity: 0.7;
+        }
+    
+        .details { 
+            /* Constrained to 90% as requested */
+            width: 90%; 
+            font-size: 0.95rem; 
+            line-height: 1.7; 
+            margin-top: 5vh; 
+            margin-left: auto;
+            margin-right: auto;
+            text-align: justify;
+            text-justify: inter-word;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+    
+        .details p {
+            text-align: justify;
+            text-align-last: center;
+            margin-bottom: 1.2em;
+        }
+    
+        .details p.underline {
+            text-align: center;
+            text-align-last: center;
+            display: block;
+            margin-top: 25px;
+        }
+    
+        .underline { text-decoration: underline; text-underline-offset: 3px; }
+    
+        /* RSVP Form Scaling */
+        .rsvp-form { 
+            width: 100%;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            margin-top: -1em;
+        }
+    
+        .input-group { 
+            margin-bottom: 15px; 
+            font-size: 1.1rem; 
+            display: flex; 
+            align-items: baseline; 
+            width: 100%;
+            justify-content: center;
+        }
+        
+        input { 
+            border: none; background: transparent; 
+            background-image: linear-gradient(to right, black 60%, rgba(255,255,255,0) 0%); 
+            background-position: bottom; background-size: 8px 1px; background-repeat: repeat-x; 
+            font-family: 'Gotu', sans-serif; font-size: 1.1rem; outline: none; 
+            width: 220px; padding: 0 5px; color: black; margin-left: 10px; 
+        }
+    
+        .attendance-toggle { 
+            cursor: pointer; 
+            margin-top: 15px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            font-size: 1.1rem; 
+            transition: all 0.2s ease; 
+        }
+    
+        .x-mark { 
+            font-size: 1rem;
+            margin-right: 10px; 
+            opacity: 0; 
+            transition: opacity 0.2s ease;
+        }
+    
+        .attendance-toggle.active .x-mark { opacity: 1; }
+        
+        #errorMessage { color: #6E111F; font-size: 0.8rem; margin-top: 10px; display: none; text-transform: none; }
+        #successMessage { font-size: 1.5rem; margin-top: 10px; display: none; }
+    
+        /* MOBILE PORTRAIT OVERRIDES */
+        @media screen and (max-width: 600px) and (orientation: portrait) {
+            body {
+                overflow-y: auto;
+                align-items: flex-start;
+            }
+            .container {
+                width: 100%;
+                padding: 100px 30px; /* Strong top/bottom padding for mobile */
+            }
+            h1 { font-size: 1.4rem; }
+            h2 { font-size: 1.6rem; }
+            .logistics, .input-group, input, .attendance-toggle { font-size: 0.9rem; }
+            input { width: 140px; }
+            .details { font-size: 0.75rem; width: 92%; line-height: 1.6; }
+        }
+    </style>
+</head>
+<body>
+
+    <img src="doily_1.png" id="animatedDoily" alt="RSVP">
+
+    <div class="container" id="mainContent">
+        <div class="top-section">
+            <!-- <h1>RSVP</h1> -->
+             <h2>⊹₊˚‧︵‿₊୨ᰔ୧₊‿︵‧˚₊⊹</h2>
+            <h2>⋆✴︎˚｡⋆❀ 妈妈生日快乐! ❀⋆✴︎˚｡⋆</h2>
+            <h2>♡</h2>
+            <break></break>
+            <img src="mom-me.jpg" alt="mom-me" width="800">
+            
+            
+        </div>
+        <div class="logistics">
+            <p>. ݁₊ ⊹ . ݁˖ . ݁祝福长寿似松柏. ݁₊ ⊹ . ݁˖ . ݁</p>
+            <break></break>
+            <p>. ݁₊ ⊹ . ݁˖ . ݁福如东海，寿比南山. ݁₊ ⊹ . ݁˖ . ݁</p>
+        </div>
+    </div>
+
+    <script>
+        const doilyImg = document.getElementById('animatedDoily');
+        const content = document.getElementById('mainContent');
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbziZvz1_hLi_fZtgNCWmr1Py3KiHMSDq-dGWZaH7btYa1Xk6TgfYOYiXkEODlby3kgpJw/exec';
+
+        for (let i = 1; i <= 6; i++) {
+            new Image().src = `doily_${i}.png`;
+        }
+
+        doilyImg.addEventListener('click', function() {
+            if (this.classList.contains('final')) return;
+            let frame = 1;
+            const totalFrames = 6;
+            const intervalTime = 2500 / totalFrames; 
+
+            const animation = setInterval(() => {
+                frame++;
+                const scaleValue = 1 + ((frame - 1) * (2.16 / (totalFrames - 1)));
+                doilyImg.style.transform = `translate(-50%, -50%) scale(${scaleValue})`;
+                
+                if (frame <= totalFrames) {
+                    doilyImg.src = `doily_${frame}.png`;
+                }
+
+                if (frame === totalFrames) {
+                    clearInterval(animation);
+                    doilyImg.classList.add('final');
+                    content.classList.add('visible');
+                }
+            }, intervalTime);
+        });
+
+        const rsvpToggle = document.getElementById('rsvpToggle');
+        rsvpToggle.addEventListener('click', function() {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const error = document.getElementById('errorMessage');
+            const success = document.getElementById('successMessage');
+
+            // 1. Validation Check
+            if (!name.trim() || !email.trim()) {
+                error.style.display = 'block';
+                return;
+            }
+
+            // 2. Immediate Visual Feedback
+            error.style.display = 'none';
+            success.style.display = 'block'; // Show heart instantly
+            this.classList.add('active');
+            this.style.pointerEvents = 'none'; // Disable further clicks
+
+            // 3. Background Data Submission
+            fetch(scriptURL, { 
+                method: 'POST', 
+                mode: 'no-cors', 
+                body: new URLSearchParams({ 'name': name, 'email': email }) 
+            })
+            .catch(err => console.error('Data failed to send in background:', err.message));
+        });
+    </script>
+</body>
+</html>
